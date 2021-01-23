@@ -1,0 +1,268 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <Windows.h>
+#include <limits.h>
+
+int i;
+
+typedef struct
+{
+	char name[99];
+	char work[99];
+	char adress[99];
+	struct ring *next;
+} ring;
+
+ring *first = NULL;
+
+int get_int() // функция для ввода целого числа
+{
+	long long temp = (unsigned)INT_MIN - 1;
+	scanf("%lli", &temp);
+	while (temp < INT_MIN || temp > INT_MAX) {
+		printf("Error! Again: ");
+		scanf("%*[^\r^\n]");
+		scanf("%lli", &temp);
+	}
+	return (int)temp;
+}
+
+void _add(ring *new_member) // фукнция для добавления в список
+{
+	if (first == NULL) // если список пуст
+		first = new_member; // добавляем
+	else
+	{ // если список пуст
+		ring *t = first;
+		while ((*t).next) // идем по списку, пока не дойдем до конца
+			t = (*t).next;
+		(*t).next = new_member; // добавляем
+	}
+}
+
+void add() // функция для заполнения данных и добавления в список
+{
+	scanf("%*[^\r^\n]"); // очищаем входной поток
+	ring *new_ring = (ring*)malloc(sizeof(ring)); // выделяем память под новую структуру
+	// заполняем данные
+	printf("UserName: ");
+	scanf("%*[\n]%[^\r^\n]", (*new_ring).name, 98);
+	printf("Work: ");
+	scanf("%*[\n]%[^\r^\n]", (*new_ring).work, 98);
+	printf("Adrees: ");
+	scanf("%*[\n]%[^\r^\n]", (*new_ring).adress, 98);
+	(*new_ring).next = NULL;
+	_add(new_ring); // добавляем в список
+}
+
+
+void print() // функция для вывода
+{
+	if (first) // проверяем, что список не пуст
+	{
+		ring *t = first;
+		printf("# %s # %s # %s #\n", "UserName", "Work", "Adress");
+		do { // в цикле ввыводим данные
+			printf("# %s # %s # %s #\n", (*t).name, (*t).work, (*t).adress);
+			t = (*t).next;
+		} while (t);
+		printf("\n");
+	}
+	else
+		printf("List is empty!\n");
+	system("pause");
+}
+
+void _del(ring *m) // функция для удаления
+{
+	if (first == m) // нужно удалить первый элемент
+	{
+		first = (*first).next;
+		free(m);
+	}
+	else { // иначе
+		ring *t = (*first).next;
+		ring *prev = first;
+		while (t) // в цикле проходимся по списку, пока не дойдем до конца или найдем элемент
+		{
+			if (t == m) // если нашли
+			{
+				ring *next = (*t).next; // сохраняем указатель на следующий элемент
+				free(t); // освобождаем файл
+				(*prev).next = next; // переназначаем указатель у предыдущего элемента
+				break;
+			}
+			else
+			{
+				prev = t; // переназначаем предыдущий элемент
+				t = (*t).next; // переназначаем текущий элемент
+			}
+		}
+	}
+}
+
+void find() // функция для поиска и удаления нужного элемента
+{
+	if (first) // проверяем список, если список пуст
+	{
+		ring *t = first, *new_ring;
+		new_ring = (ring*)malloc(sizeof(ring));
+
+		// выводим меню выбора
+		char *fields[] = { "UserName", "Количество сделок", "Объем торгов" };
+		printf("Write field: \n");
+		for (i = 0; i < 3; i++)
+			printf("%d. %s\n", i + 1, fields[i]);
+		printf("Write number: ");
+		int point = get_int();
+
+		// заполняем данные в зависимости от выбора
+		system("cls");
+		switch (point) {
+		case 1:
+			printf("Write UserName: ");
+			scanf("%*[\n]%[^\r^\n]", (*new_ring).name, 98);
+			break;
+		case 2:
+			printf("Write Work: ");
+			scanf("%*[\n]%[^\r^\n]", (*new_ring).work, 98);
+			break;
+		case 3:
+			printf("Write Adress: ");
+            scanf("%*[\n]%[^\r^\n]", (*new_ring).adress, 98);
+			break;
+		default:
+			printf("\nError!\n"); system("pause"); return;
+		}
+
+		int deleted = 0;
+		do {
+			if ((point == 1 && strcmp((*t).name, (*new_ring).name) == 0) ||
+				(point == 2 && (*t).work == (*new_ring).work) ||
+				(point == 3 && (*t).adress == (*new_ring).adress)) { // ищем бумагу
+				_del(t); // удаляем
+				deleted = 1; // помечаем, что бумага была удалена
+				break;
+			}
+			t = (*t).next;
+		} while (t);
+		free(new_ring); // особождаем временный элемент
+		if (deleted) // выводим результат
+			printf("Result: deleted!\n");
+		else
+			printf("Result: not deleted!\n");
+	}
+	else {
+		printf("List is empty!\n");
+	}
+	system("pause");
+}
+
+
+void del_all() // функция удаления всех элементов
+{
+	if (first) // проверяем, если список не пуст
+	{
+		ring *t = first; // выставляем текущий элемента
+		ring *next; // указатель на следующий элемент
+		do { // в цикле проходимся по списку
+			next = (*t).next; // сохраняем указатель на следующий элемент
+			free(t); // освобождаем память
+			t = next; // меняем текущий элемент
+		} while (t);
+		first = NULL; // помечаем, что список пуст
+	}
+}
+
+void save() // функция для сохранения
+{
+	if (first) // проверяем, не пуст ли список
+	{
+		FILE *out;
+		out = fopen("file.txt", "w"); // открываем файл
+		ring *t = first;
+		do
+		{
+			fprintf(out, "%s#%s#%s\n", (*t).name, (*t).adress, (*t).work); // в цикле сохраняем данные
+			t = (*t).next;
+		} while (t);
+		fclose(out);
+	}
+	else
+		system("rm file.txt");
+}
+
+void load() // функция для загрузки из файла
+{
+	del_all(); // очищаем список
+	FILE *inp;
+	inp = fopen("file.txt", "r"); // открываем файл
+	if (inp == NULL) // проверяем открытие файла
+	{
+		printf("File not founded!\n");
+		system("pause");
+		return;
+	}
+	ring *new_ring;
+	while (1)
+	{
+		new_ring = (ring*)malloc(sizeof(ring)); // выделяем память под новый элемент
+		if (fscanf(inp, "%[^\r^\n]\r#%[^\r^\n]\r#%[^\r^\n]\r\n", &(*new_ring).name, &(*new_ring).adress, (*new_ring).work) == -1) { // если считывания не произошло, то
+			free(new_ring); // освобождаем файл
+			break; // и выходим из цикла
+		}
+		(*new_ring).next = NULL;
+		_add(new_ring); // добавляем в список
+	}
+	fclose(inp);
+}
+
+int main()
+{
+
+	int point = 1;
+	while (point != 0)
+	{
+		system("cls");
+	    // выводим меню
+		char* items = {
+			"1. Add\n"
+			"2. Print\n"
+			"3. Delete one\n"
+			"4. Delete all\n"
+			"5. Save\n"
+			"6. Load\n"
+			"0. Close\n"
+		};
+		printf("%s", items);
+		printf("Number: ");
+		point = get_int();
+		system("cls");
+		// запускаем функции
+		switch (point) {
+		case 1:
+			add(); break;
+		case 2:
+			print(); break;
+		case 3:
+			find(); break;
+		case 4:
+			del_all(); break;
+		case 5:
+			save(); break;
+		case 6:
+			load(); break;
+		case 0:
+			break;
+		default:
+			printf("\nError!\n"); system("pause");
+		}
+	}
+
+	return 0;
+}
+
+// данные сохраняются в файл db.txt

@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1555132287 source:c:\users\800216\desktop\codeblock\project\newproject6laba\main.c
+	<stdio.h>
+	<stdlib.h>
+	<malloc.h>
+	<Windows.h>
+	<limits.h>
+

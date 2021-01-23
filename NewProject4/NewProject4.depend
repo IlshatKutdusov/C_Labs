@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1552849137 source:c:\users\800216\desktop\codeblock\project\newproject4\main.c
+	<stdio.h>
+	<stdlib.h>
+	<malloc.h>
+
+1552301857 source:c:\documents and settings\user335-01\Рабочий стол\codeblock\projects\newproject4\main.c
+	<stdio.h>
+	<stdlib.h>
+	<malloc.h>
+	<locale.h>
+

@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1551697954 source:c:\documents and settings\user335-01\Рабочий стол\codeblock\projects\newproject3\main.c
+	<stdio.h>
+	<stdlib.h>
+	<malloc.h>
+
